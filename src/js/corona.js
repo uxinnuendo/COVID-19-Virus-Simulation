@@ -158,6 +158,8 @@ function initControls() {
 	_.el.controls.range.directtransmission = document.querySelector('[data-range-directtransmission')
 	_.el.controls.range.locationtransmission = document.querySelector('[data-range-locationtransmission')
 	_.el.controls.range.socialdistancing = document.querySelector('[data-range-socialdistancing')
+	_.el.controls.range.capgeninfections = document.querySelector('[data-range-capgeninfections')
+	_.el.controls.range.capmeetingsdaily = document.querySelector('[data-range-capmeetingsdaily')
 
 	_.el.controls.label.speed = document.querySelector('[data-value-speed')
 	_.el.controls.label.poolsize = document.querySelector('[data-value-poolsize')
@@ -169,6 +171,8 @@ function initControls() {
 	_.el.controls.label.directtransmission = document.querySelector('[data-value-directtransmission')
 	_.el.controls.label.locationtransmission = document.querySelector('[data-value-locationtransmission')
 	_.el.controls.label.socialdistancing = document.querySelector('[data-value-socialdistancing')
+	_.el.controls.label.capgeninfections = document.querySelector('[data-value-capgeninfections')
+	_.el.controls.label.capmeetingsdaily = document.querySelector('[data-value-capmeetingsdaily')
 
 	const rangeInputs = {
 		'speed': {
@@ -212,6 +216,18 @@ function initControls() {
 		},
 		'socialdistancing': {
 			value: appState.infections.rate.socialDistancing,
+		},
+		'capmeetingsdaily': {
+			value: appState.people.meetingsDailyCap,
+			min: 0,
+			max: 10,
+			step: 1,
+		},
+		'capgeninfections': {
+			value: appState.infections.rate.r0max,
+			min: 0,
+			max: 10,
+			step: 1,
 		}
 	}
 
@@ -364,7 +380,9 @@ function initState() {
 			infectionRateContact: appState.infections.rate.directContact,
 			infectionRateDistancing: appState.infections.rate.socialDistancing,
 			infectionDuration: appState.infections.duration.person,
-			timeIsolation: appState.infections.isolationtime
+			timeIsolation: appState.infections.isolationtime,
+			meetingsDailyCap: appState.people.meetingsDailyCap,
+			r0max: appState.infections.rate.r0max
 		}
 
 	appState = window._appState = new _.State(chartPlotter, presets)
@@ -477,6 +495,10 @@ function loop() {
   	const p = appState.peopleArr[idx]
   	const travellerPercent = appState.people.travellers / appState.people.poolSize
 
+  	if (appState.isNewDay) {
+  		p.visitsDaily = 0;
+  	}
+
   	if (p.infected) {
   		p.checkInfection();
   	}
@@ -520,6 +542,8 @@ function loop() {
   const uninfected = appState.peopleArr.length - appState.infections.total - recoveries
   appState.infections.uninfected = uninfected
   _.el.uninfected.innerText = uninfected
+
+  appState.isNewDay = false;
 
   requestAnimationFrame(loop);
 }

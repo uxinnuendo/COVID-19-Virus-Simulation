@@ -21,6 +21,7 @@ class Person{
 		this.quarantined = !!quarantine;
 		this.stay = false;
 		this.visits = 0;
+		this.visitsDaily = 0; /* Total contacts, cleared daily */
 		this.visitors = 0;
 		this.contactPool = []
 
@@ -30,6 +31,7 @@ class Person{
 		this.dayInfected = null
 		this.infected = !!infected;
 		this.infectedIsolation = false;
+		this.infectionsCount = 0; /* Infections transferred to others */
 
 		this.previouslyInfected = false;
 		this.allowReinfection = false;
@@ -91,9 +93,11 @@ class Person{
 
 		const withinIsolationPeriod = this.infected && isolationBegin <= this.appState.timeline.days && isolationEnd >= this.appState.timeline.days
 
+		const belowMaxVisitsThreshold = this.visitsDaily < this.appState.people.meetingsDailyCap
+
 		this.infectedIsolation = !!withinIsolationPeriod;
 
-		return !withinIsolationPeriod && !this.stay && !this.travelling && !this.quarantined
+		return belowMaxVisitsThreshold && !withinIsolationPeriod && !this.stay && !this.travelling && !this.quarantined
 	}
 
 	setDestination({x, y}, idx) {
@@ -181,9 +185,10 @@ class Person{
 					if (!visiting.visitors) this.stay = false;
 				}
 
-				this.calculateLocationInfections()
+				this.generateInfections()
 
 				this.visits++;
+				this.visitsDaily++;
 				this.goHome()
 
 			}
@@ -201,7 +206,7 @@ class Person{
 
 	}
 
-	calculateLocationInfections() {
+	generateInfections() {
 		const locationKey = `${this.x}:${this.y}`;
 
 		if (this.infected) {
@@ -214,9 +219,12 @@ class Person{
 			/* Infect person visited */
 			if (this.visitingIdx && !this.appState.peopleArr[this.visitingIdx].infected) {
 				const infectionChance = this.getChance(this.appState.infections.rate.directContact),
-					socialDistanced = this.getChance(this.appState.infections.rate.socialDistancing)
-				if (infectionChance && !socialDistanced) {
+					socialDistanced = this.getChance(this.appState.infections.rate.socialDistancing),
+					belowR0max = this.infectionsCount < this.appState.infections.rate.r0max
+
+				if (belowR0max && infectionChance && !socialDistanced) {
 					this.appState.peopleArr[this.visitingIdx].infected = true;
+					this.infectionsCount++;
 				}
 			}
 
@@ -235,9 +243,12 @@ class Person{
 			/* Get infection from person visited */
 			if (this.visitingIdx && this.appState.peopleArr[this.visitingIdx].infected) {
 				const infectionChance = this.getChance(this.appState.infections.rate.directContact),
-					socialDistanced = this.getChance(this.appState.infections.rate.socialDistancing)
-				if (infectionChance && !socialDistanced) {
+					socialDistanced = this.getChance(this.appState.infections.rate.socialDistancing),
+					belowR0max = this.appState.peopleArr[this.visitingIdx].infectionsCount < this.appState.infections.rate.r0max
+
+				if (belowR0max && infectionChance && !socialDistanced) {
 					this.infected = true;
+					this.appState.peopleArr[this.visitingIdx].infectionsCount++;
 				}
 			}
 

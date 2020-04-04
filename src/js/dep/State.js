@@ -70,12 +70,15 @@ class State {
 			infectionRateContact = 0.5,
 			infectionRateDistancing = 0.5,
 			infectionDuration = 14,
-			timeIsolation = 0.15
+			timeIsolation = 0.15,
+			meetingsDailyCap = 5,
+			r0max = 3
 		} = {}
 	) {
 
 		const _this = this;
 
+		this.isNewDay = true;
 		this.peopleArr = []
 		this.locations = []
 		this.playing = playing
@@ -91,6 +94,7 @@ class State {
 				updateDom('days', v)
 				program.simulation('day')
 
+				_this.isNewDay = true /* Set false after each loop ends */
 				_this.locations = [] /* Clear all area infections */
 				_this.d3Render()
 			},
@@ -111,7 +115,8 @@ class State {
 			rate: {
 				location: infectionRateLocation, // percent risk at visit
 				directContact: infectionRateContact, // percent risk at visit
-				socialDistancing: infectionRateDistancing // percent of direct contacts social distanced
+				socialDistancing: infectionRateDistancing, // percent of direct contacts social distanced
+				r0max: r0max // percent of direct contacts social distanced
 			},
 			duration: {
 				location: 1, // days
@@ -139,6 +144,7 @@ class State {
 			minPool: 2,
 			maxPool: 10,
 			visitorCap: 3, // max concurrent visitors for any one person
+			meetingsDailyCap: meetingsDailyCap,
 			quarantined: quarantined, // percent of pool
 			travellerCap: travelCap, // percent of pool
 			_travellers: 0, // count
@@ -205,6 +211,13 @@ class State {
 				break;
 			case 'socialdistancing':
 				this.infections.rate.socialDistancing = value
+				break;
+			case 'capmeetingsdaily':
+				this.people.meetingsDailyCap = value
+				break;
+			case 'capgeninfections':
+				this.infections.rate.r0max = value
+				break;
 		}
 	}
 
