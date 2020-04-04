@@ -1,0 +1,48 @@
+{
+  "name": "covid-19",
+  "version": "0.1.0",
+  "description": "Covid 19 virus simulator",
+  "main": "app.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uxinnuendo/COVID-19-Virus-Simulation.git"
+  },
+  "keywords": [
+    "covid",
+    "covid-19",
+    "virus",
+    "simulation"
+  ],
+  "author": "Mike Lange",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/uxinnuendo/COVID-19-Virus-Simulation/issues"
+  },
+  "homepage": "https://github.com/uxinnuendo/COVID-19-Virus-Simulation#readme",
+  "devDependencies": {
+    "@babel/core": "^7.8",
+    "@babel/preset-env": "^7.8",
+    "babel-loader": "^8.0.6",
+    "css-loader": "^3.4.2",
+    "d3": "^5.15.1",
+    "gulp": "^4.0.2",
+    "gulp-sass": "^4.0.2",
+    "html-webpack-plugin": "^4.0.4",
+    "mini-css-extract-plugin": "^0.9.0",
+    "node-sass": "^4.13.1",
+    "rangeslider-js": "^3.2.5",
+    "sass": "^1.25.0",
+    "sass-loader": "^8.0.2",
+    "style-loader": "^1.1.3",
+    "terser-webpack-plugin": "^2.3.5",
+    "webpack": "^4.42.1",
+    "webpack-cli": "^3.3.11"
+  },
+  "scripts": {
+    "dev": "webpack --env.development",
+    "dev:watch": "webpack --env.development --watch ",
+    "build": "webpack --env.production",
+    "build:watch": "webpack --env.production --watch"
+  },
+  "dependencies": {}
+}

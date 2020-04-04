@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<title>COVID-19 Simulator</title>
+
+	<link rel="dns-prefetch" href="//fonts.gstatic.com">
+	<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+	<link href="./css/app.css" rel="stylesheet">
+
+</head>
+
+<body class="home">
+
+	<div class="">
+		<section data-component-banner class="section banner">
+			<div class="layer">
+
+				<div class="title">
+					<h1>Virus simulator</h1>
+					<div class="links">
+						<a href="javascript:;" data-simulation data-sim-program="a">Simulate ebb & flow</a> <i class="fa fa-caret-left" aria-hidden="true"></i>
+					</div>
+				</div>
+
+				<div class="canvas-controls">
+					<div class="inner-scroll">
+						<div class="rangebar">
+							<div class="label">Speed </div>
+							<input data-range-speed type="range">
+						</div>
+						<div class="rangebar">
+							<div class="label">People (<strong>restart</strong>) <span data-value-poolsize></span></div>
+							<input data-range-poolsize type="range">
+						</div>
+						<div class="rangebar">
+							<div class="label">Starting Infections (<strong>restart</strong>) <span data-value-startinfections></span></div>
+							<input data-range-startinfections type="range">
+						</div>
+						<div class="rangebar">
+							<div class="label">Quarantined (<strong>restart</strong>) (<span data-value-quarantine></span>)
+								<br/><small>People with zero chance of transmission</small></div>
+							<input data-range-quarantine type="range">
+						</div>
+						<div class="rangebar">
+							<div class="label">Max 'On the move' (<span data-value-travelcap></span>)
+								<br/><small>People moving freely to 'meet' others</small></div>
+							<input data-range-travelcap type="range">
+						</div>
+						<div class="rangebar">
+							<div class="label">Infect (<span data-value-locationtransmission></span>) by Location Surfaces
+								<br/><small>Chance of virus transmission by location</small></div>
+							<input data-range-locationtransmission type="range">
+						</div>
+						<div class="rangebar">
+							<div class="label">Infect (<span data-value-directtransmission></span>) by Direct Contact
+								<br/><small>Chance of virus transmission by person</small></div>
+							<input data-range-directtransmission type="range">
+						</div>
+						<div class="rangebar">
+							<div class="label">Chance (<span data-value-socialdistancing></span>) of Social Distancing
+								<br/><small>Stops infection spread via any direct contact (meeting)</small>
+							 </div>
+							<input data-range-socialdistancing type="range">
+						</div>
+						<div class="rangebar">
+							<div class="label">Infection Duration (days) <span data-value-infectiontime></span></div>
+							<input data-range-infectiontime type="range">
+						</div>
+						<div class="rangebar">
+							<div class="label">Isolation (<span data-value-infectedisolation></span>) During Infection
+								<br/><small>Percent of infection duration isolated and non transferrable</small></div>
+							<input data-range-infectedisolation type="range">
+						</div>
+					</div>
+					<div class="buttons">
+						<button id="startstop">Stop</button>
+						<button id="reset">Restart</button>
+					</div>
+				</div>
+
+				<div class="canvas-stats">
+					<div class="chart-container">
+						<svg class="svg-chart" id="d3-chart" />
+					</div>
+					<div class="txt-days"><span>Days </span><em data-days></em></div>
+					<div><i class="green"></i><span>On the move </span><em data-travellers></em></div>
+					<div><i class="gray"></i><span>At Home </span><em data-athome></em></div>
+					<div><i class="gray"></i><span>Awaiting Visitors </span><em data-stay></em></div>
+					<div><i class="blue"></i><span>Quarantined </span><em data-quarantined></em></div>
+					<div><i class="red"></i><span>Infected </span><em class="txt-red" data-infected></em></div>
+					<div><i class="isolate"></i><span>Isolated </span><em class="txt-red" data-isolated></em></div>
+					<div><i></i><span>Recovered </span><em class="txt-blue" data-recover></em></div>
+					<div><i></i><span>Uninfected </span><em data-uninfected></em></div>
+				</div>
+
+				<canvas class="class" id="canvas"></canvas>
+
+			</div>
+		</section>
+	</div>
+
+<script src="app.js?b83e579f5cf3a09174f9"></script></body>
+</html>

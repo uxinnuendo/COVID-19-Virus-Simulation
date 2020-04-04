@@ -1,0 +1,31 @@
+@mixin basestyle() {
+	position: absolute;
+	background: rgba(71, 52, 9, .4);
+	font-family: Nunito, Arial;
+	font-size: 12px;
+	padding: 15px;
+	font-weight: 300;
+	color: #c5c2c2;
+	width: 200px;
+	transition: transform 0.2s ease-out;
+
+	display: none;
+	._on & {
+		display: block;
+	}
+}
+
+@mixin customscroll() {
+	/*** SCROLL ***/
+	&::-webkit-scrollbar {
+			width: 2px;
+	}
+
+	&::-webkit-scrollbar-track {
+		background: #33332f;
+	}
+
+	&::-webkit-scrollbar-thumb {
+		background: #797373;
+	}
+}
