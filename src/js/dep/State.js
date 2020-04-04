@@ -59,7 +59,7 @@ const el = {
 
 class State {
 
-	constructor(d3, {
+	constructor(d3, stop, {
 			speed = 4,
 			poolSize = 5000,
 			playing = false,
@@ -77,6 +77,8 @@ class State {
 	) {
 
 		const _this = this;
+
+		this.stop = stop;
 
 		this.isNewDay = true;
 		this.peopleArr = []
@@ -131,7 +133,7 @@ class State {
 				program.simulation('infectionTotal')
 
 				if (!v) {
-					stop();
+					_this.stop();
 				}
 			},
 			get total() {

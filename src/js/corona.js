@@ -385,7 +385,7 @@ function initState() {
 			r0max: appState.infections.rate.r0max
 		}
 
-	appState = window._appState = new _.State(chartPlotter, presets)
+	appState = window._appState = new _.State(chartPlotter, stop, presets)
 	appState.d3Render()
 
 }
@@ -512,12 +512,11 @@ function loop() {
 	  	if (travelToIdx != idx &&
 	  		!visitPerson.quarantined &&
 	  		!visitPerson.travelling &&
-	  		visitPerson.visitors < appState.people.visitorCap
+	  		visitPerson.visitorIdxs.length < appState.people.visitorCap
 	  	) {
 
-	  		visitPerson.visitors++
 		  	visitPerson.stay = true
-		  	p.setDestination(visitPerson.home, travelToIdx)
+		  	p.setDestination(visitPerson.home, travelToIdx, idx)
 	  	}
   	}
 

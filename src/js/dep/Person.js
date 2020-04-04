@@ -20,19 +20,21 @@ class Person{
 		this.r = infected ? 2 : 1
 		this.quarantined = !!quarantine;
 		this.stay = false;
+
 		this.visits = 0;
 		this.visitsDaily = 0; /* Total contacts, cleared daily */
-		this.visitors = 0;
-		this.contactPool = []
 
-		this._travelling = false;
-		this.visitingIdx = null;
+		this.visitingIdx = null; /* Traveling to  */
+		this.visitorIdxs = []; /* People visiting */
+
+		this.contactPool = []; /* People for interaction */
 
 		this.dayInfected = null
 		this.infected = !!infected;
 		this.infectedIsolation = false;
 		this.infectionsCount = 0; /* Infections transferred to others */
 
+		this._travelling = false;
 		this.previouslyInfected = false;
 		this.allowReinfection = false;
 		this.recovered = false;
@@ -100,9 +102,11 @@ class Person{
 		return belowMaxVisitsThreshold && !withinIsolationPeriod && !this.stay && !this.travelling && !this.quarantined
 	}
 
-	setDestination({x, y}, idx) {
+	setDestination({x, y}, destinationIdx, visitorIdx) {
 		this.travelling = true
-		this.visitingIdx = idx
+		this.visitingIdx = destinationIdx
+		this.appState.peopleArr[this.visitingIdx].visitorIdxs.push(this.visitorIdx)
+
 		this.dest = {
 			x, y
 		}
@@ -177,12 +181,13 @@ class Person{
 				this.home.y != this.y
 			) {
 
-				const visiting = this.appState.peopleArr.find(e => e.home.x == destX && e.home.y == destY)
+				const destinationPerson = this.appState.peopleArr[this.visitingIdx]
 
-				if (visiting.visitors > 0) {
-					visiting.visitors--;
+				const index = destinationPerson.visitorIdxs.findIndex(e => e === this.visitingIdx)
+				destinationPerson.visitorIdxs.splice(index, 1)
 
-					if (!visiting.visitors) this.stay = false;
+				if (destinationPerson.visitorIdxs.length === 0) {
+					destinationPerson.stay = false;
 				}
 
 				this.generateInfections()
