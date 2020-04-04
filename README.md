@@ -9,6 +9,7 @@ A generic simulation of possible human viral transference, based on a variety of
 The following factors currently contribute to the risk of transference:
 
 * Density of people (UI controlled)
+* RO max
 * Number of contacts per person that can lead to possible interaction events [2-10]
 * Number of possible contact events per day [UI controlled]
 * Chance of transference by a location visited by an infected person [UI controlled] [chance of infection cleared after 1 day]
