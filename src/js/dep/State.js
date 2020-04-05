@@ -26,14 +26,14 @@ const el = {
 		key: null,
 		state: {},
 		simulation: function () {},
-		allowReset: function () { return false },
+		clearProgramOnChange: function () { return false },
 		reset: function(force, key) {
-			if (!force && !this.allowReset(key)) return;
+			if (!force && !this.clearProgramOnChange(key)) return;
 
 			this.key = null;
 			this.state = {}
 			this.simulation = function () {}
-			this.allowReset = function () { return false }
+			this.clearProgramOnChange = function () { return false }
 
 			const links = Array.from(el.simulate);
 			for (const i in links) {
@@ -65,12 +65,12 @@ class State {
 			playing = false,
 			start = 10,
 			travelCap = 0.5,
-			quarantined = 0.15,
+			quarantined = 0.0,
 			infectionRateLocation = 0.1,
-			infectionRateContact = 0.5,
+			infectionRateContact = 0.6,
 			infectionRateDistancing = 0.5,
 			infectionDuration = 14,
-			timeIsolation = 0.15,
+			timeIsolation = 0.35,
 			meetingsDailyCap = 5,
 			r0max = 3
 		} = {}
@@ -94,7 +94,6 @@ class State {
 			set days(v) {
 				this._days = v
 				updateDom('days', v)
-				program.simulation('day')
 
 				_this.isNewDay = true /* Set false after each loop ends */
 				_this.locations = [] /* Clear all area infections */

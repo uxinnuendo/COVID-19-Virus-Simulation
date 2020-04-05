@@ -10,7 +10,7 @@ let appState
  * Programs that change simulation variables accordingly
  */
 
-function setSimulationProgram(ev, key) {
+async function setSimulationProgram (ev, key) {
 
 	const programKey = ev?.target?.dataset?.simProgram || key,
 		link = ev?.target || document.querySelector(`[data-sim-program='${key}']`)
@@ -24,6 +24,7 @@ function setSimulationProgram(ev, key) {
 	}
 
 	_.program.key = programKey
+	_.program.state = {}
 
 	const links = Array.from(_.el.simulate);
 	for (const i in links) {
@@ -34,9 +35,85 @@ function setSimulationProgram(ev, key) {
 
 	switch(programKey) {
 
-		/* Ebb & Flow */
+		/* Natural peak and response */
 		case 'a':
-			_.program.allowReset = function (key) {
+			if (_appState.timeline.days) {
+				await restart();
+			}
+
+			_.program.clearProgramOnChange = function (key) {
+				return !["speed"].includes(key)
+			}
+
+			const travelCap = 1
+			appState.people.travellerCap = travelCap
+			_.el.controls.label.travelcap.innerText = (_.rounder(travelCap * 100)) + '%'
+			_.el.controls.range.travelcap['rangeslider-js'].update({value:travelCap})
+			_.el.controls.range.travelcap.parentNode.classList.add("_simulated")
+
+			const socialDistancing = 0.0
+			appState.infections.rate.socialDistancing = socialDistancing
+			_.el.controls.label.socialdistancing.innerText = (_.rounder(socialDistancing * 100)) + '%'
+			_.el.controls.range.socialdistancing['rangeslider-js'].update({value:socialDistancing})
+			_.el.controls.range.socialdistancing.parentNode.classList.add("_simulated")
+
+			const maxContactsDaily = 5
+			appState.people.meetingsDailyCap = maxContactsDaily
+			_.el.controls.label.capmeetingsdaily.innerText = maxContactsDaily
+			_.el.controls.range.capmeetingsdaily['rangeslider-js'].update({value:maxContactsDaily})
+			_.el.controls.range.capmeetingsdaily.parentNode.classList.add("_simulated")
+
+			_.program.simulation = function (field) {
+				const _update = (travelCap, socialDistancing, maxContactsDaily) => {
+					appState.people.travellerCap = travelCap
+					_.el.controls.label.travelcap.innerText = (_.rounder(travelCap * 100)) + '%'
+					_.el.controls.range.travelcap['rangeslider-js'].update({value:travelCap})
+
+					appState.infections.rate.socialDistancing = socialDistancing
+					_.el.controls.label.socialdistancing.innerText = (_.rounder(socialDistancing * 100)) + '%'
+					_.el.controls.range.socialdistancing['rangeslider-js'].update({value:socialDistancing})
+
+					appState.people.meetingsDailyCap = maxContactsDaily
+					_.el.controls.label.capmeetingsdaily.innerText = maxContactsDaily
+					_.el.controls.range.capmeetingsdaily['rangeslider-js'].update({value:maxContactsDaily})
+				}
+
+				switch(field) {
+					case 'infectionTotal':
+						const t = appState.infections.total,
+							p = appState.people.poolSize,
+							days = appState.timeline.days
+
+						const phase1 = (p / 100), /* 1% */
+							phase2 = (p / 50), /* 2% */
+							phase3 = (p / 33), /* 3% */
+							phase4 = (p / 20) /* 5% */
+
+						if (t > phase4) {
+							_update(0.2, 0.8, 1)
+							_.program.simulation = () => {}
+						}
+						else
+						if (t > phase3) {
+							_update(0.4, 0.6, 2)
+						}
+						else
+						if (t > phase2) {
+							_update(0.6, 0.4, 3)
+						}
+						else
+						if (t > phase1) {
+							_update(0.8, 0.1, 4)
+						}
+						break;
+				}
+			}
+
+			break;
+
+		/* Ebb & Flow */
+		case 'f':
+			_.program.clearProgramOnChange = function (key) {
 				return ["travelcap","socialdistancing"].includes(key)
 			}
 			_.program.simulation = function (field) {
@@ -267,13 +344,6 @@ function initControls() {
 		}
 	}
 
-	let restartTicker = null;
-	function restart() {
-		console.log("Restarting..");
-		clearTimeout(restartTicker)
-		restartTicker = setTimeout(reset, 500)
-	}
-
 	function updateLabelValue(type, value, isPercentage) {
 		try {
 			_.el.controls.label[type].innerText = isPercentage ? _.rounder(value * 100) + '%' : value
@@ -298,6 +368,17 @@ function initControls() {
 		reset();
 	})
 
+}
+
+let restartTicker = null;
+function restart() {
+	console.log("Restarting..");
+	clearTimeout(restartTicker)
+
+	return new Promise(resolve => {
+		const _reset = () => reset(resolve)
+		restartTicker = setTimeout(_reset, 500)
+	})
 }
 
 /**
@@ -446,7 +527,7 @@ function canvasSetup() {
  * Looping control
  */
 
-function reset() {
+function reset(resolve) {
 	console.info("Reset");
 
 	if (!appState.playing) {
@@ -460,6 +541,8 @@ function reset() {
 	initState();
 	initPeople();
 	start();
+
+	resolve && resolve()
 }
 
 function stop() {

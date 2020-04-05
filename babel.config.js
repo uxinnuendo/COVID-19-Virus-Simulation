@@ -8,11 +8,16 @@ module.exports = function (api) {
 				"targets": {
 					"browsers": ["> 1%", "last 2 versions", "not ie <= 8", "ie >= 11"]
 				}
-			}
+			},
 		]
 	];
 
+	const plugins = [
+		"@babel/plugin-transform-runtime"
+	]
+
   return {
+  	plugins,
 		presets
   };
 };
